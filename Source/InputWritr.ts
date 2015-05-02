@@ -1,11 +1,26 @@
 interface IInputWritrSettings {
+    // The mapping of events to their key codes to their callbacks.
     triggers: any;
-    getTimestamp: any;
-    eventInformation: any;
+
+    // The first argument to be passed to event callbacks.
+    eventInformation?: any;
+
+    // A Function to return the current time as a Number. If not provided, all 
+    // variations of performance.now are tried; if they don't exist, Date.now
+    // is used.
+    getTimestamp?: any;
+
+    // Known, allowed aliases for triggers.
     aliases?: any;
+
     keyAliasesToCodes?: any;
     keyCodesToAliases?: any;
+
+    // Whether events are initially allowed to trigger (by default, true).
     canTrigger?: boolean;
+
+    // Whether triggered inputs are initally allowed to be written to history
+    // (defaults to true).
     isRecording?: boolean;
 };
 
@@ -88,28 +103,16 @@ class InputWritr {
      * Resests the InputWritr.
      * 
      * @constructor
-     * @param {Object} triggers   The mapping of events to their key codes to
-     *                            their callbacks.
-     * @param {Object} [aliases]   Known, allowed aliases for triggers.
-     * @param {Function} [getTimestamp]   A Function to return the current time
-     *                                    as a Number. If not provided, all 
-     *                                    variations of performance.now are 
-     *                                    tried; if they don't exist, 
-     *                                    Date.getTime is used.
-     * @param {Mixed} [eventInformation]   The first argument to be passed to
-     *                                     event callbacks (defaults to 
-     *                                     undefined).
-     * @param {Boolean} [canTrigger]   Whether inputs are currently allowed to
-     *                                 trigger (defaults to true).
-     * @param {Boolean} [isRecording]   Whether triggered inputs are currently
-     *                                  allowed to be written to history
-     *                                  (defaults to true).
+     * @param {IInputWritrSettings} settings
      */
     constructor(settings: IInputWritrSettings) {
+        if (!settings.triggers) {
+            throw new Error("No triggers given to InputWritr.");
+        }
         this.triggers = settings.triggers;
 
-        // Headless browsers like PhantomJS won't know performance, so Date.now
-        // is used as a backup
+        // Headless browsers like PhantomJS might not know performance, so 
+        // Date.now is used as a backup
         if (typeof settings.getTimestamp === "undefined") {
             if (typeof performance === "undefined") {
                 this.getTimestamp = function (): number {
