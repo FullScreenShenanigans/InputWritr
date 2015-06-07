@@ -401,7 +401,9 @@ module InputWritr {
          * @param {Object} aliasesRaw
          */
         addAliases(aliasesRaw: any): void {
-            for (var aliasName in aliasesRaw) {
+            var aliasName: string;
+
+            for (aliasName in aliasesRaw) {
                 if (aliasesRaw.hasOwnProperty(aliasName)) {
                     this.addAliasValues(aliasName, aliasesRaw[aliasName]);
                 }
