@@ -44,7 +44,7 @@ if (typeof performance === "undefined") {
 describe("constructor", function () {
 	it("throws errors when not given triggers", function () {
 		chai.expect(function () {
-			new InputWritr({});
+			new InputWritr.InputWritr({});
 		}).to.throw("No triggers given to InputWritr.");
 	});
 });
