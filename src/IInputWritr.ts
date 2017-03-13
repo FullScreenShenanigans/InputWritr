@@ -108,7 +108,7 @@ export interface IInputWritrSettings {
 }
 
 /**
- * Bridges from input events to known actions.
+ * Bridges input events to known actions.
  */
 export interface IInputWritr {
     /** 
