@@ -23,17 +23,24 @@ export interface ITriggerGroup {
 }
 
 /**
- * Function to determine whether some functionality is available.
- */
-export interface IBooleanGetter {
-    (...args: any[]): boolean;
-}
-
-/**
  * Known, allowed aliases for triggers.
  */
 export interface IAliases {
     [i: string]: any[];
+}
+
+/**
+ * Determines whether triggering is possible for an event.
+ * 
+ * @param event   The event function (or string alias thereof) to call.
+ * @param keyCode   The alias of the event Function under triggers[event],
+ *                  if event is a string.
+ * @param sourceEvent   The raw event that caused the calling Pipe
+ *                      to be triggered, such as a MouseEvent.
+ * @returns Whether triggering is possible.
+ */
+export interface ICanTrigger {
+    (event: Function | string, keyCode?: number | string, sourceEvent?: Event): boolean;
 }
 
 /**
@@ -104,7 +111,7 @@ export interface IInputWritrSettings {
     /**
      * Whether events are initially allowed to trigger (by default, true).
      */
-    canTrigger?: boolean | IBooleanGetter;
+    canTrigger?: boolean | ICanTrigger;
 }
 
 /**
@@ -145,20 +152,6 @@ export interface IInputWritr {
      * @returns The machine-usable character code of the input.
      */
     convertKeyStringToAlias(key: number | string): number | string;
-
-    /**
-     * @returns Whether this is currently allowing inputs.
-     */
-    getCanTrigger(): IBooleanGetter;
-
-    /**
-     * Sets whether this is to allow inputs.
-     * 
-     * @param canTriggerNew   Whether this is now allowing inputs. This 
-     *                        may be either a Function (to be evaluated 
-     *                        on each input) or a general Boolean.
-     */
-    setCanTrigger(canTriggerNew: boolean | IBooleanGetter): void;
 
     /**
      * Adds a list of values by which an event may be triggered.

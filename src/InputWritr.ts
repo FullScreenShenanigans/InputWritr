@@ -1,5 +1,5 @@
 import {
-    IAliases, IAliasesToCodes, IAliasKeys, IBooleanGetter, ICodesToAliases,
+    IAliases, IAliasesToCodes, IAliasKeys, ICanTrigger, ICodesToAliases,
     IInputWritr, IInputWritrSettings, IPipe,
     ITriggerCallback, ITriggerContainer, ITriggerGroup
 } from "./IInputWritr";
@@ -11,32 +11,32 @@ export class InputWritr implements IInputWritr {
     /**
      * A mapping of events to their key codes, to their callbacks.
      */
-    private triggers: ITriggerContainer;
+    private readonly triggers: ITriggerContainer;
 
     /**
      * Known, allowed aliases for triggers.
      */
-    private aliases: IAliases;
+    private readonly aliases: IAliases;
 
     /**
      * Function to generate a current timestamp, commonly performance.now.
      */
-    private getTimestamp: () => number;
+    private readonly getTimestamp: () => number;
 
     /**
      * An optional Boolean callback to disable or enable input triggers.
      */
-    private canTrigger: IBooleanGetter;
+    private readonly canTrigger: ICanTrigger;
 
     /**
      * A quick lookup table of key aliases to their character codes.
      */
-    private keyAliasesToCodes: IAliasesToCodes;
+    private readonly keyAliasesToCodes: IAliasesToCodes;
 
     /**
      * A quick lookup table of character codes to their key aliases.
      */
-    private keyCodesToAliases: ICodesToAliases;
+    private readonly keyCodesToAliases: ICodesToAliases;
 
     /**
      * Initializes a new instance of the InputWritr class.
@@ -66,9 +66,13 @@ export class InputWritr implements IInputWritr {
             this.getTimestamp = settings.getTimestamp;
         }
 
-        this.canTrigger = settings.hasOwnProperty("canTrigger")
-            ? settings.canTrigger as IBooleanGetter
-            : (): boolean => true;
+        if ("canTrigger" in settings) {
+            this.canTrigger = typeof settings.canTrigger === "function"
+                ? settings.canTrigger
+                : (): boolean => (settings.canTrigger as boolean);
+        } else {
+            this.canTrigger = (): boolean => true;
+        }
 
         this.aliases = {};
 
@@ -168,28 +172,6 @@ export class InputWritr implements IInputWritr {
         return typeof this.keyAliasesToCodes[key] !== "undefined"
             ? this.keyAliasesToCodes[key as string]
             : -1;
-    }
-
-    /**
-     * @returns Whether this is currently allowing inputs.
-     */
-    public getCanTrigger(): IBooleanGetter {
-        return this.canTrigger;
-    }
-
-    /**
-     * Sets whether this is to allow inputs.
-     * 
-     * @param canTriggerNew   Whether this is now allowing inputs. This 
-     *                        may be either a Function (to be evaluated 
-     *                        on each input) or a general Boolean.
-     */
-    public setCanTrigger(canTriggerNew: boolean | IBooleanGetter): void {
-        if (typeof canTriggerNew === "boolean") {
-            this.canTrigger = (): boolean => canTriggerNew;
-        } else {
-            this.canTrigger = canTriggerNew;
-        }
     }
 
     /**
